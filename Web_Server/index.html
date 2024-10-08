@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulb Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        function fetchData() {
+            fetch('bulb_project/fetch_data.php')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const tableBody = document.getElementById('data-body');
+                    tableBody.innerHTML = ''; // Clear previous data
+
+                    // Iterate over the data and create table rows
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.id}</td>
+                            <td>${row.bulb_number}</td>
+                            <td>${row.status}</td>
+                            <td>${row.timestamp}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                    document.getElementById('data').innerHTML = 'Error loading data.';
+                });
+        }
+
+        // Call fetchData when the window loads
+        window.onload = () => {
+            fetchData();
+            // Set an interval to refresh data every 2 seconds (2000 milliseconds)
+            setInterval(fetchData, 2000); // 2 seconds
+        };
+    </script>
+</head>
+<body>
+    <h1>Bulb Status</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Bulb Number</th>
+                <th>Status</th>
+                <th>Timestamp</th>
+            </tr>
+        </thead>
+        <tbody id="data-body">
+            <tr>
+                <td colspan="4">Loading data...</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
